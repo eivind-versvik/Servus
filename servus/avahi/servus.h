@@ -313,16 +313,17 @@ private:
     static void _resolveCBS(AvahiServiceResolver* resolver, AvahiIfIndex,
                             AvahiProtocol, AvahiResolverEvent event,
                             const char* name, const char*, const char*,
-                            const char* host, const AvahiAddress*, uint16_t,
+                            const char* host, const AvahiAddress* address, const uint16_t port,
                             AvahiStringList* txt, AvahiLookupResultFlags flags,
                             void* servus)
     {
-        ((Servus*)servus)->_resolveCB(resolver, event, name, host, txt, flags);
+        ((Servus*)servus)->_resolveCB(resolver, event, name, host, address, port, txt, flags);
     }
 
     void _resolveCB(AvahiServiceResolver* resolver,
                     const AvahiResolverEvent event, const char* name,
-                    const char* host, AvahiStringList* txt,
+                    const char* host, const AvahiAddress* address,
+                    const uint16_t port, AvahiStringList* txt,
                     const AvahiLookupResultFlags flags)
     {
         // If browsing through the local interface, consider only the local
@@ -340,8 +341,12 @@ private:
 
         case AVAHI_RESOLVER_FOUND:
         {
+            char addr_char[AVAHI_ADDRESS_STR_MAX];
+            avahi_address_snprint(addr_char, sizeof(addr_char), address);
             ValueMap& values = _instanceMap[name];
             values["servus_host"] = host;
+            values["servus_address"] = addr_char;
+            values["servus_port"] = std::to_string(unsigned(port));;
             for (; txt; txt = txt->next)
             {
                 const std::string entry(reinterpret_cast<const char*>(
