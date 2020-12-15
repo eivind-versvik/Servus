@@ -368,6 +368,16 @@ const std::string& Servus::getHost(const std::string& instance) const
 {
     return get(instance, "servus_host");
 }
+    
+const std::string& Servus::getAddress(const std::string& instance) const
+{
+    return get(instance, "servus_address");
+}
+
+const std::string& Servus::getPort(const std::string& instance) const
+{
+    return get(instance, "servus_port");
+}
 
 bool Servus::containsKey(const std::string& instance,
                          const std::string& key) const
